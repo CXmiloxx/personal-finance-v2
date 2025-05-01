@@ -6,15 +6,27 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: ChildrenType) {
-  const [theme, setTheme] = useState<themeType>(() => {
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as themeType;
-      return savedTheme || 'light';
-    }
-    return 'light';
-  });
+  const [mounted, setMounted] = useState<Boolean | null>(false);
+  const [theme, setTheme] = useState<themeType>('light');
 
   useEffect(() => {
+    setMounted(true);
+
+    const savedTheme = localStorage.getItem('theme') as themeType;
+    if (savedTheme) {
+      setTheme(savedTheme);
+    }
+
+    if (savedTheme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     localStorage.setItem('theme', theme);
 
     if (theme === 'dark') {
@@ -22,7 +34,7 @@ export function ThemeProvider({ children }: ChildrenType) {
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
@@ -32,6 +44,10 @@ export function ThemeProvider({ children }: ChildrenType) {
     theme,
     toggleTheme,
   };
+
+  if (!mounted) {
+    return <div suppressHydrationWarning></div>;
+  }
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
