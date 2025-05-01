@@ -1,26 +1,20 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-background: #ffffff;
-  --color-foreground: #171717;
+  --color-primary: #ffffff;
+  --color-primary-dark: #101828;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  @apply dark:bg-[var(--color-primary)]  font-sans transition-colors duration-300;
+
+
 }
-html{
+html {
   transition: all 0.3s ease;
 }
