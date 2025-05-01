@@ -14,25 +14,52 @@ export const useUserAuth = () => {
     if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
+  const verifyToken = async () => {
+    try {
+      const res = await fetch(`${API_URL}/auth/verify`, {
+        method: 'GET',
+        credentials: 'include',
+      });
+
+      if (!res.ok) {
+        throw new Error('Token no valido o expirado.');
+      }
+
+      const data = await res.json();
+      return data;
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      setError(message);
+      console.error('Error al verificar el token:', message);
+    }
+  };
+
   const login = async (email: string, password: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_URL}/limbs/auth/login`, {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail: email, userPass: password }),
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
       });
 
       const userData = await res.json();
 
       if (!res.ok) {
-        setError(userData.error || 'Algo salio mal en el login.');
+        setError(userData.message || 'Algo salio mal en el login.');
         return;
       }
 
       if (userData) {
         console.log('Login exitoso:', userData);
+        const informationUser = await verifyToken();
+        if (!informationUser) {
+          setError('Token no valido o expirado.');
+          return;
+        }
+        console.log('informationUser:', informationUser);
 
         setUser(userData);
         localStorage.setItem('user', JSON.stringify(userData));
