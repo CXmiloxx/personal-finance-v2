@@ -1,6 +1,6 @@
 'use client';
-import { ChildrenType } from '@/types/childrenType';
-import { ThemeContextType, themeType } from '@/types/theme';
+import { ChildrenType } from '@/types/children.types';
+import { ThemeContextType, themeType } from '@/types/theme.types';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
